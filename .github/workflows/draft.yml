@@ -1,0 +1,95 @@
+name: "Create draft for release"
+on:
+#  push:
+#    branches:
+#      - master
+  workflow_dispatch:
+#  schedule:
+#    - cron: '0 14 * * 1,3'
+
+permissions: write-all
+
+jobs:
+  draft:
+    name: Create Draft
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+
+      - name: Install ergo
+        run: |
+          go install github.com/beatlabs/ergo/cmd/cli@latest
+          mv ~/go/bin/cli ~/go/bin/ergo
+
+      - name: Fill in access-token in .ergo.yml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '.ergo.yml'
+        env:
+          github.access-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move .ergo.yml to ~/
+        run: mv .ergo.yml ~/
+
+      - name: Get release date (tomorrow)
+        id: date
+        run: echo "::set-output name=tomorrow::$(date -d 'tomorrow' +'%a, %b %d')"
+
+      - name: Align develop with staging-develop
+        run: git push origin origin/develop:staging-develop --force
+
+      - name: Check status of branches
+        run: ergo status --owner nstratos --repo deploy | tee status.txt
+
+      - name: Set commit variables
+        id: commits
+        run: echo "::set-output name=master-behind::$(cat status.txt | grep -v BASE | grep master | awk '{print $2}')"
+
+      - name: Push staging-develop to master
+        if: steps.commits.outputs.master-behind > 0
+        run: git push origin origin/staging-develop:master
+
+      - name: Create the release draft
+        if: steps.commits.outputs.master-behind > 0
+        run: ergo draft --skip-confirmation --base master --owner nstratos --repo deploy --branches release-ar,release-mx,release-cl,release-co,release-gr,release-pe
+
+      - name: Send slack message with the draft link
+        if: steps.commits.outputs.master-behind > 0
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+          payload: |
+            {
+              "message": "New `${{ github.repository }}` release for ${{ steps.date.outputs.tomorrow }}:\nhttps://github.com/${{ github.repository }}/releases"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send slack message if there is nothing to release
+        if: steps.commits.outputs.master-behind == 0
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+          payload: |
+            {
+              "message": "`${{ github.repository }}` release for ${{ steps.date.outputs.tomorrow }}:\nNothing to release"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send slack message if the action fails
+        if: failure()
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+          payload: |
+            {
+              "message": "Something went wrong. Please check the logs and trigger the action again manually:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

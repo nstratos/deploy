@@ -1,0 +1,21 @@
+generic:
+  remote: origin
+  base-branch: "develop"
+  status-branches: "develop,staging-develop,master,release-gr,release-pe,release-co,release-cl,release-mx,release-ar"
+  release-branches: "release-ar,release-mx,release-cl,release-co,release-gr,release-pe"
+github:
+  access-token: ""
+  release-body-prefix: "### Added"
+  default-owner: "nstratos"
+  default-repo: "rest"
+release:
+  branch-map:
+    release-gr: ":greece:"
+    release-pe: ":peru:"
+    release-cl: ":chile:"
+    release-co: ":colombia:"
+    release-mx: ":mexico:"
+    release-ar: ":argentina:"
+  on-deploy:
+    body-branch-suffix-find: "-No-red.svg"
+    body-branch-suffix-replace: "-green.svg"
