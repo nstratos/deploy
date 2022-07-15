@@ -7,7 +7,7 @@ github:
   access-token: ""
   release-body-prefix: "### Added"
   default-owner: "nstratos"
-  default-repo: "rest"
+  default-repo: "deploy"
 release:
   branch-map:
     release-gr: ":greece:"
