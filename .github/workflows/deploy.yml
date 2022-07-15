@@ -42,4 +42,4 @@ jobs:
         run: mv .ergo.yml ~/
 
       - name: Start deployment
-        run: ergo deploy --publish-draft --skip-confirmation --releaseInterval 5m --owner nstratos --repo deploy --branches release-pe
+        run: ergo deploy --skip-confirmation --releaseInterval 5m --owner nstratos --repo deploy --branches release-pe
