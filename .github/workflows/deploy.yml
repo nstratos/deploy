@@ -11,26 +11,34 @@ permissions: write-all
 
 jobs:
   deploy-peru:
-    name: Trigger Peru deployment
+    name: Start Peru deployment
     runs-on: ubuntu-latest
     environment:
       name: Peru
     steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Trigger Peru deployment
+      - name: Start Peru deployment
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-pe
   
   deploy-greece:
-    name: Trigger Greece deployment
+    name: Start Greece deployment
     runs-on: ubuntu-latest
     needs: deploy-peru
     environment:
       name: Greece
     steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Trigger Greece deployment
+      - name: Start Greece deployment
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-gr
