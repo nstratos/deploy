@@ -14,6 +14,7 @@ runs:
         go-version: 1.17
 
     - name: Install ergo
+      shell: bash
       run: |
         go install github.com/beatlabs/ergo/cmd/cli@latest
         mv ~/go/bin/cli ~/go/bin/ergo
@@ -26,4 +27,5 @@ runs:
         github.access-token: ${{ inputs.token }}
 
     - name: Move .ergo.yml to ~/
+      shell: bash
       run: mv .ergo.yml ~/
