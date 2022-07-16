@@ -10,36 +10,27 @@ on:
 permissions: write-all
 
 jobs:
-  deployment:
-    name: Deploy to production
+  deploy-peru:
+    name: Trigger Peru deployment
     runs-on: ubuntu-latest
     environment:
       name: Peru
     steps:
-      - name: Check out Rest code
-        uses: actions/checkout@v3
+      - uses: .github/actions/prepare-ergo
         with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger Peru deployment
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-pe
+  
+  deploy-greece:
+    name: Trigger Greece deployment
+    runs-on: ubuntu-latest
+    needs: deploy-peru
+    environment:
+      name: Greece
+    steps:
+      - uses: .github/actions/prepare-ergo
         with:
-          go-version: 1.17
-
-      - name: Install ergo
-        run: |
-          go install github.com/beatlabs/ergo/cmd/cli@latest
-          mv ~/go/bin/cli ~/go/bin/ergo
-
-      - name: Fill in access-token in .ergo.yml
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: '.ergo.yml'
-        env:
-          github.access-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Move .ergo.yml to ~/
-        run: mv .ergo.yml ~/
-
-      - name: Start deployment
-        run: ergo deploy --skip-confirmation --releaseInterval 5m --owner nstratos --repo deploy --branches release-pe
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger Greece deployment
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-gr

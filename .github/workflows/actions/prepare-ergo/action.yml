@@ -1,0 +1,34 @@
+name: Prepare ergo
+
+inputs:
+  token:
+    description: A GitHub token secret usually accessed using secrets.GITHUB_TOKEN
+    required: true
+
+runs:
+  using: composite
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+
+      - name: Install ergo
+        run: |
+          go install github.com/beatlabs/ergo/cmd/cli@latest
+          mv ~/go/bin/cli ~/go/bin/ergo
+
+      - name: Fill in access-token in .ergo.yml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '.ergo.yml'
+        env:
+          github.access-token: ${{ inputs.token }}
+
+      - name: Move .ergo.yml to ~/
+        run: mv .ergo.yml ~/
