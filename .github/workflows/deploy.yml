@@ -30,7 +30,7 @@ jobs:
         echo "draft: ${{ steps.last_release.outputs.draft }}"
 
     - name: Publish draft release
-      if: steps.last_release.outputs.draft == true
+      if: steps.last_release.outputs.draft == "true"
       uses: eregon/publish-release@v1.0.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,7 +38,7 @@ jobs:
         release_id: ${{ steps.last_release.outputs.id }}
 
   deploy-ar:
-    name: Start deployment for Argentina
+    name: Start Argentina deployment
     runs-on: ubuntu-latest
     needs: publish-latest-draft
     environment:
@@ -55,7 +55,7 @@ jobs:
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-ar
 
   deploy-mx:
-    name: Start deployment for Mexico
+    name: Start Mexico deployment
     runs-on: ubuntu-latest
     needs: deploy-ar
     environment:
@@ -72,7 +72,7 @@ jobs:
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-mx
 
   deploy-cl:
-    name: Start deployment for Chile
+    name: Start Chile deployment
     runs-on: ubuntu-latest
     needs: deploy-mx
     environment:
@@ -89,7 +89,7 @@ jobs:
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-cl
 
   deploy-co:
-    name: Start deployment for Colombia
+    name: Start Colombia deployment
     runs-on: ubuntu-latest
     needs: deploy-cl
     environment:
@@ -106,7 +106,7 @@ jobs:
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-co
 
   deploy-pe:
-    name: Start deployment for Peru
+    name: Start Peru deployment
     runs-on: ubuntu-latest
     needs: deploy-co
     environment:
