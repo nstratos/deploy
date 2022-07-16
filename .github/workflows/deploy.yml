@@ -37,13 +37,12 @@ jobs:
       with:
         release_id: ${{ steps.last_release.outputs.id }}
 
-  deploy-peru:
-    name: Start Peru deployment
+  deploy-ar:
+    name: Start deployment for Argentina
     runs-on: ubuntu-latest
     needs: publish-latest-draft
-    concurrency: Peru
     environment:
-      name: Peru
+      name: Production
     steps:
       - name: Check out Rest code
         uses: actions/checkout@v3
@@ -52,16 +51,83 @@ jobs:
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Start Peru deployment
+      - name: Trigger deployment with ergo
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-ar
+
+  deploy-mx:
+    name: Start deployment for Mexico
+    runs-on: ubuntu-latest
+    needs: deploy-ar
+    environment:
+      name: Production
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/prepare-ergo
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger deployment with ergo
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-mx
+
+  deploy-cl:
+    name: Start deployment for Chile
+    runs-on: ubuntu-latest
+    needs: deploy-mx
+    environment:
+      name: Production
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/prepare-ergo
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger deployment with ergo
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-cl
+
+  deploy-co:
+    name: Start deployment for Colombia
+    runs-on: ubuntu-latest
+    needs: deploy-cl
+    environment:
+      name: Production
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/prepare-ergo
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger deployment with ergo
+        run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-co
+
+  deploy-pe:
+    name: Start deployment for Peru
+    runs-on: ubuntu-latest
+    needs: deploy-co
+    environment:
+      name: Production
+    steps:
+      - name: Check out Rest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/prepare-ergo
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger deployment with ergo
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-pe
-  
-  deploy-greece:
+
+  deploy-gr:
     name: Start Greece deployment
     runs-on: ubuntu-latest
-    needs: publish-latest-draft
-    concurrency: Peru
+    needs: deploy-pe
     environment:
-      name: Peru
+      name: Production
     steps:
       - name: Check out Rest code
         uses: actions/checkout@v3
@@ -70,5 +136,5 @@ jobs:
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Start Greece deployment
+      - name: Trigger deployment with ergo
         run: ergo deploy --skip-confirmation --owner nstratos --repo deploy --branches release-gr
