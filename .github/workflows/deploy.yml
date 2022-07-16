@@ -41,6 +41,7 @@ jobs:
     name: Start Peru deployment
     runs-on: ubuntu-latest
     needs: publish-latest-draft
+    concurrency: Peru
     environment:
       name: Peru
     steps:
@@ -57,7 +58,8 @@ jobs:
   deploy-greece:
     name: Start Greece deployment
     runs-on: ubuntu-latest
-    needs: deploy-peru
+    needs: publish-latest-draft
+    concurrency: Peru
     environment:
       name: Peru
     steps:
