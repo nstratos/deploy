@@ -21,7 +21,10 @@ jobs:
         with:
           fetch-depth: 0
       - name: debug
-        run: pwd && ls -l
+        run: |
+          pwd 
+          cd ..
+          ls -l
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
