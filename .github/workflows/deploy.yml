@@ -10,6 +10,33 @@ on:
 permissions: write-all
 
 jobs:
+  publish-latest-draft:
+    name: Publish latest draft release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get latest draft release
+      id: last_release
+      uses: InsonusK/get-latest-release@v1.0.1
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        exclude_types: "prerelease|release"
+        view_top: 1
+
+    - run: |
+        echo "Will attempt to publish the following release:"
+        echo "id: ${{ steps.last_release.outputs.id }}"
+        echo "name: ${{ steps.last_release.outputs.name }}"
+        echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
+        echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
+        echo "draft: ${{ steps.last_release.outputs.draft }}"
+
+    - name: Publish draft release
+      uses: eregon/publish-release@v1.0.3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.last_release.outputs.id }}
+
   deploy-peru:
     name: Start Peru deployment
     runs-on: ubuntu-latest
