@@ -21,10 +21,11 @@ jobs:
         with:
           fetch-depth: 0
       - run: pwd
-      - run: ls -l
-      - run: cd ..
-      - run: pwd
-      - run: ls -l
+      - run: ls -la
+      - run: |
+          cd ..
+          pwd
+          ls -la
       - uses: ./.github/actions/prepare-ergo
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
