@@ -30,7 +30,7 @@ jobs:
         echo "draft: ${{ steps.last_release.outputs.draft }}"
 
     - name: Publish draft release
-      if: steps.last_release.outputs.draft
+      if: steps.last_release.outputs.draft == true
       uses: eregon/publish-release@v1.0.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
